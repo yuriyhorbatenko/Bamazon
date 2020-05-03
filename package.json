@@ -1,0 +1,24 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "it's like Amazon",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuriyhorbatenko/Bamazon.git"
+  },
+  "author": "Yuriy H.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yuriyhorbatenko/Bamazon/issues"
+  },
+  "homepage": "https://github.com/yuriyhorbatenko/Bamazon#readme",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "inquirer": "^7.1.0",
+    "mysql": "^2.18.1"
+  }
+}
