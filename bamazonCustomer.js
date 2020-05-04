@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('cli-table');
 var colors = require("colors");
 
 var connection = mysql.createConnection({
@@ -50,115 +51,86 @@ function hello() {
 }
 
 
+function options() {
+
+    inquirer
+
+        .prompt({
+            name: "options",
+            type: "list",
+            message: "\n  What you like to do: ".brightYellow,
+            choices: [
+                "Buy",
+                "Go Back",
+                "Exit"
+            ]
+        })
+
+        .then(function (answer) {
+            switch (answer.options) {
+                case "Buy":
+                    buy();
+                    break;
+
+                case "Go Back":
+                    hello();
+                    break;
+
+                case "Exit":
+                    connection.end();
+                    break;
+            }
+        });
+}
+
 function autoMotive() {
 
-    connection.query("SELECT product_name, price FROM products WHERE department_name = 'Automotive'", function (err, results) {
+    connection.query("SELECT item_id, product_name, price FROM products WHERE department_name = 'Automotive'", function (err, results) {
         if (err) throw err;
 
-        var choiceArray = [];
-        var priceArray = [];
-        var listArray = [];
-
-
         for (var i = 0; i < results.length; i++) {
-            listArray.push(results[i].product_name + results[i].price)
-            choiceArray.push(results[i].product_name)
-            priceArray.push(results[i].price)
+
+            var itemID = results[i].item_id;
+            var productName = results[i].product_name;
+            var productPrice = results[i].price;
+
+            console.log("  iD# - ".brightCyan + colors.brightRed(itemID) + " - " + colors.brightCyan(productName) + " - " + colors.brightRed(productPrice) + " $".brightCyan)
         }
-
-
-        console.log(priceArray)
-        console.log(choiceArray)
-        console.log(listArray)
-
-        inquirer
-
-            .prompt([
-
-                {
-                    name: "choice",
-                    type: "list",
-                    message: "Here is some items for you:".brightYellow,
-                    choices: choiceArray + "?"
-
-                },
-
-            ])
-
-            .then(function (answer) {
-
-                var item = answer.choice
-                console.log(item)
-
-
-                inquirer
-
-                    .prompt([
-
-                        {
-                            name: "quantity",
-                            type: "input",
-                            message: "\n  Please select quantity for: ".brightYellow + item,
-                            validate: function (value) {
-                                if (isNaN(value) === false) {
-                                    return true;
-                                }
-                                return false;
-                            }
-                        },
-                        {
-                            name: "purchase",
-                            type: "list",
-                            message: "\n  Would you like to buy: ".brightYellow + item + " ?".brightYellow,
-                            choices: [
-                                "Yes",
-                                "No, Go Back",
-                                "Main Menu"
-                            ]
-                        },
-                    ])
-
-                    .then(function (answer) {
-
-                        if (answer.purchase === "Yes") {
-
-
-                            var query = "SELECT stock_quantity FROM products WHERE ?";
-
-                            connection.query(query, { product_name: item }, function (err, res) {
-
-                                var itemQuantity = res[0].stock_quantity;
-
-                                if (itemQuantity === 0) {
-                                    console.log("  Sorry! \n  This Item: ".brightRed + item + "\n  Out of Stock!".brightRed)
-                                    //autoMotive();
-                                }
-
-                                else if (itemQuantity < answer.quantity) {
-                                    console.log("  Sorry! \n  Not Enough: ".brightRed + item + "\n  Only ".brightRed + itemQuantity + " In Stock!".brightRed)
-                                    //autoMotive();
-                                }
-
-                                else if (itemQuantity >= answer.quantity) {
-                                    console.log("  Congratulations! \n  Your Item: ".brightCyan + item + "\n  Have Been Purchased!".brightCyan)
-                                    //autoMotive();
-                                }
-
-                            });
-
-                        }
-
-                        else if (answer.purchase === "No, Go Back") {
-                            autoMotive();
-                        }
-
-                        else {
-                            hello();
-                        }
-                    });
-            });
+        options();
     });
 }
 
 
+var buy = function () {
+
+    inquirer.prompt([{
+
+        name: "productID",
+        type: "input",
+        message: "Please enter product ID for product you want:".brightYellow,
+        validate: function (value) {
+            if (isNaN(value) === false) {
+                return true;
+            }
+            return false;
+        }
+    },
+
+    {
+        name: "productUnits",
+        type: "input",
+        message: "How many units do you want?".brightYellow,
+        validate: function (value) {
+            if (isNaN(value) === false) {
+                return true;
+            }
+            return false
+        }
+    }])
+
+        .then(function (answer) {
+
+
+        });
+};
 
